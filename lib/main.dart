@@ -1,7 +1,10 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:convert';
-import 'package:efe_porject/card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,12 +15,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ScreenUtilInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const MyHomePage(),
       ),
-      home: const MyHomePage(),
     );
   }
 }
@@ -59,113 +68,132 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.cyan,
+        title: Text(
+          "efe Project",
+          style: TextStyle(color: Colors.black),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  const Text("currency"),
-                  SizedBox(
-                    width: 20,
-                    child: CheckboxListTile(
-                        value: showCurrency,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            showCurrency = value!;
-                          });
-                        }),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Text("Currency"),
+                    SizedBox(
+                      width: 20.w,
+                      child: CheckboxListTile(
+                          value: showCurrency,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              showCurrency = value!;
+                            });
+                          }),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text("DialCode"),
+                    SizedBox(
+                      width: 20.w,
+                      child: CheckboxListTile(
+                          value: showDialCode,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              showDialCode = value!;
+                            });
+                          }),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text("Uni Code"),
+                    SizedBox(
+                      width: 20.w,
+                      child: CheckboxListTile(
+                          value: showUniCode,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              showUniCode = value!;
+                            });
+                          }),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Text("Flag"),
+                    SizedBox(
+                      width: 20.w,
+                      child: CheckboxListTile(
+                          value: showFlag,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              showFlag = value!;
+                            });
+                          }),
+                    ),
+                  ],
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    overlayColor: MaterialStateProperty.all(Colors.cyan),
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                  const Text("dialCode"),
-                  SizedBox(
-                    width: 20,
-                    child: CheckboxListTile(
-                        value: showDialCode,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            showDialCode = value!;
-                          });
-                        }),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  const Text("uni Code"),
-                  SizedBox(
-                    width: 20,
-                    child: CheckboxListTile(
-                        value: showUniCode,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            showUniCode = value!;
-                          });
-                        }),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  const Text("flag"),
-                  SizedBox(
-                    width: 20,
-                    child: CheckboxListTile(
-                        value: showFlag,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            showFlag = value!;
-                          });
-                        }),
-                  ),
-                ],
-              ),
-              ElevatedButton(
                   onPressed: () {
                     setState(() {
                       showResult = !showResult;
                     });
                   },
-                  child: const Text("get countries")),
-              Visibility(
-                visible: showResult,
-                child: Container(
-                  padding: const EdgeInsets.all((20)),
-                  child: FutureBuilder(
-                    future: getCountries(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-                      if (snapshot.hasData) {
-                        List<CountriesCard> cards = [];
-                        for (var c in snapshot.data!) {
-                          var country = CountriesCard(
-                            name: c["name"] ?? "name",
-                            unicodeFlag: c["unicodeFlag"] ?? "uniflag",
-                            flag: c["flag"] ?? "flag",
-                            currency: c["currency"] ?? "curr",
-                            dialcode: c["dialCode"] ?? "dialCode",
-                            showCurrency: showCurrency,
-                            showDialCode: showDialCode,
-                            showFlag: showFlag,
-                            showUniCode: showUniCode,
-                          );
-                          cards.add(country);
-                        }
-                        return Column(
-                          children: cards,
-                        );
-                      }
-                      {
-                        return const CircularProgressIndicator();
-                      }
-                    },
+                  child: const Text(
+                    "Get Countries",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ),
-              ),
-            ],
+                Visibility(
+                  visible: showResult,
+                  child: Container(
+                    padding: const EdgeInsets.all((5)),
+                    child: FutureBuilder(
+                      future: getCountries(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+                        if (snapshot.hasData) {
+                          List<CountriesCard> cards = [];
+                          for (var c in snapshot.data!) {
+                            var country = CountriesCard(
+                              name: c["name"] ?? "name",
+                              unicodeFlag: c["unicodeFlag"] ?? "uniflag",
+                              flag: c["flag"] ?? "flag",
+                              currency: c["currency"] ?? "curr",
+                              dialcode: c["dialCode"] ?? "dialCode",
+                              showCurrency: showCurrency,
+                              showDialCode: showDialCode,
+                              showFlag: showFlag,
+                              showUniCode: showUniCode,
+                            );
+                            cards.add(country);
+                          }
+                          return Column(
+                            children: cards,
+                          );
+                        }
+                        {
+                          return const CircularProgressIndicator();
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -201,26 +229,58 @@ class CountriesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: AppCard(
-        title: name,
-        subtitle: showCurrency ? Text("  " + currency) : const Text(""),
-        leading: showUniCode ? Text(unicodeFlag) : const Text(""),
-        trailing: showDialCode ? Text(dialcode) : const Text(""),
+      child: Center(
+        child: Card(
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          elevation: 10,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 75.h,
+            decoration: BoxDecoration(
+              color: Colors.cyan,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Text(
+                      name,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child:
+                              showUniCode ? Text(unicodeFlag) : const Text(""),
+                        ),
+                        Expanded(
+                          child: showCurrency
+                              ? Text("  " + currency)
+                              : const Text(""),
+                        ),
+                        Expanded(
+                          child: showDialCode ? Text(dialcode) : const Text(""),
+                        ),
+                        Expanded(
+                          child: showFlag
+                              ? SvgPicture.network(
+                                  flag.toString().trimRight(),
+                                  width: 20.w,
+                                )
+                              : const Text(""),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
-      // child: Row(
-      //   children: [
-      //     Text(name),
-      //     showCurrency ? Text("  " + currency) : const Text(""),
-      //     showUniCode ? Text(unicodeFlag) : const Text(""),
-      //     showDialCode ? Text(dialcode) : const Text(""),
-      //     showFlag
-      //         ? SvgPicture.network(
-      //             flag.toString().trimRight(),
-      //             width: 20,
-      //           )
-      //         : const Text(""),
-      //   ],
-      // ),
     );
   }
 }
